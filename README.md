@@ -61,7 +61,7 @@ score = 2.0 × (genre == favorite genre)                 # exact match, else 0
       − variety penalty               only if reranking is switched on (see Stretch 3)
 ```
 
-With genre, mood, energy and an acoustic preference set, the maximum possible score is **6.0** in the default mode. Every term that earns points (or loses them to a variety penalty) is listed in the explanation, for example `energy 0.82 vs target 0.85 (+1.94)`, and the listed points add up to the score.
+With genre, mood, energy and an acoustic preference set, the maximum possible score is **6.0** in the default mode. Every term that earns points (or loses them to a variety penalty) is listed in the explanation, for example `energy 0.82 vs target 0.85 (+1.94)`. The unrounded components sum to the actual score. Because individual terms and the total are displayed to two decimal places, the printed figures can occasionally differ by 0.01 due to rounding.
 
 **Why these choices?**
 
@@ -161,7 +161,7 @@ python3 -m src.experiments   # catalog counts, weight sensitivity, profile compa
 
 ## Sample Recommendation Output (baseline)
 
-Output of `python3 -m src.main`: balanced mode, variety penalty off, 30 songs, four listener profiles, top 5 each. A perfect match would score 6.00 for these profiles. Each line under "Why" is a real term in the score, and the points add up to the score shown.
+Output of `python3 -m src.main`: balanced mode, variety penalty off, 30 songs, four listener profiles, top 5 each. A perfect match would score 6.00 for these profiles. Each line under "Why" is a real scoring component. The unrounded components add up exactly; displayed two-decimal figures may differ by 0.01 because they are rounded separately.
 
 <details>
 <summary>Full output (click to expand)</summary>

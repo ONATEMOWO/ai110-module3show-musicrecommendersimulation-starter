@@ -2,7 +2,7 @@
 
 > **Stretch features only.** This file documents the four stretch features that were attempted (extra attributes, ranking modes, variety reranking, visual table), plus the starter's two general sections. It is not required for the core project.
 
-**How this log was produced.** One AI coding agent (Claude, via Claude Code) did the work in a single session, starting from one long assignment brief pasted by the student. The prompts quoted below are the real stretch sections of that brief, copied verbatim. The "review decisions" are things the agent actually did or found during that session (failing tests, bugs, alternatives it tried), taken from the session itself. Test counts are from the final run of `python3 -m pytest`. Independent human review of the result is the student's remaining step before submitting.
+**How this log was produced.** One AI coding agent (Claude, via Claude Code) did the work in a single session, starting from one long assignment brief pasted by the student. The prompts quoted below are the real stretch sections of that brief, copied verbatim. The "review decisions" are things the agent actually did or found during that session (failing tests, bugs, alternatives it tried), taken from the session itself. Test counts are from the final run of `python3 -m pytest`. After implementation, the student requested an independent ChatGPT review of the committed ZIP; the verification and remaining limits are recorded below.
 
 Final test evidence for the whole project: `python3 -m pytest` -> **210 passed** (2 original starter tests + 208 added). `python3 -m src.main`, `python3 -m src.main --mode genre-first` and `python3 -m src.main --mode mood-energy` all run and exit 0; `git diff --check` is clean.
 
@@ -35,9 +35,11 @@ The stretch prompts are quoted in the sections below.
 - Milestone 3 (final commit): the four stretch features below, documentation updated to match the final code and fresh program output.
 - Commands run by the agent included `git remote -v`, `git status -sb`, `python3 -m src.main` (with and without flags), `python3 -m src.experiments`, `python3 -m pytest`, and `git diff --check`. Nothing was pushed.
 
-**What did you verify or fix manually?**
+**What was verified after implementation?**
 
-The agent verified by running the code and tests (details per stretch below). The README's output blocks were filled by a throwaway script that runs the documented commands and pastes their real output, so documented output cannot drift from the code; the hand-written prose around them was then checked against that output. The student has not yet independently reviewed any of this.
+The agent ran code and tests while implementing the features (details per stretch below). It also generated the README output blocks from actual commands and checked the accompanying descriptions against those runs.
+
+After the implementation, the student supplied the committed ZIP for an independent ChatGPT review. That review reran all 210 tests, exercised the CLI and experiment commands, and compared all nine README command-output blocks against fresh output (all nine matched). It also inspected the dataset, shared scoring and ranking code, diversity feature, and model card. The reviewer identified a small presentation caveat: individual scoring reasons and the total are separately rounded to two decimals, so the printed figures can differ by 0.01 while the underlying components still sum correctly. This was a code-and-output audit, not a real-listener evaluation. No backend change was needed.
 
 ---
 

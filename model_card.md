@@ -40,7 +40,7 @@ The system gives every song points (default `balanced` mode):
 - **Acoustic taste:** up to 0.5 points, higher for acoustic songs if the listener likes acoustic music and higher for non-acoustic songs if they don't.
 - **Optional targets (valence, danceability, tempo, popularity, decade, instrumentalness, speechiness, liveness):** up to 0.5 points each, but *only* if the listener provided that target. Nobody is given a hidden default.
 
-It adds the points up, sorts every song from highest to lowest, and returns the top few. If two songs tie, the one with the lower `id` comes first, so the same input always gives the same output. Every point that went into a score is listed in the explanation, and the listed points add up to the score.
+It adds the points up, sorts every song from highest to lowest, and returns the top few. If two songs tie, the one with the lower `id` comes first, so the same input always gives the same output. Every scoring component is listed in the explanation. The unrounded components add up to the exact score; because each term and the total are displayed to two decimal places, the displayed figures may differ by 0.01 from rounding.
 
 **Ranking modes.** A mode is just a different set of weights for the same rule: `balanced` (genre 2.0, mood 1.5, energy 2.0), `genre-first` (4.0, 1.0, 1.0), and `mood-energy` (0.5, 3.0, 3.0). There is only one scoring algorithm.
 
@@ -116,10 +116,10 @@ What the variety rule does: it stops one artist (or genre) from filling the list
 **Method.**
 
 1. Four listener profiles were run through the real code on the real catalog, top 5 each, using the baseline settings (`balanced` mode, no variety penalty): a happy high-energy pop listener, a relaxed low-energy lofi listener, an intense rock/workout listener, and a deliberately conflicting edge case (classical, melancholy, energy 0.90). The full output is in the README.
-2. For each result I looked at: does the top 5 match the stated genre, mood and energy; how many slots matched neither genre nor mood; how far the energy of each pick is from the target; and whether the listed reasons add up to the score.
+2. For each result, the evaluation checked: does the top 5 match the stated genre, mood and energy; how many slots matched neither genre nor mood; how far the energy of each pick is from the target; and whether the unrounded explanation components add up to the score (allowing for two-decimal display rounding).
 3. A controlled weight experiment held the pop profile and the catalog fixed and halved and doubled genre, mood and energy one at a time (six variants plus the baseline).
 4. Stretch features were each compared against the baseline: a new-attribute preference added to a profile (decade for a folk listener, popularity for the pop listener), the two non-default modes on the pop and classical profiles, and the variety penalty on the pop and lofi profiles, including a measured match-quality cost.
-5. Automated tests (`python3 -m pytest`, 210 tests) cover CSV loading and numeric types, catalog validity and unique IDs, the extra columns, exact genre/mood matching, energy-distance scoring, explanation consistency (listed points sum to the score), ranking order, deterministic tie-breaking and input-order independence, distinct profiles, empty catalog, `k=0`, `k` larger than the catalog, invalid CSV rows, invalid preferences, ranking modes, variety reranking (effect, truthful explanations, determinism, top-k semantics), table formatting at many widths, the command-line options, and functional/OOP agreement.
+5. Automated tests (`python3 -m pytest`, 210 tests) cover CSV loading and numeric types, catalog validity and unique IDs, the extra columns, exact genre/mood matching, energy-distance scoring, explanation consistency (unrounded scoring components sum to the score), ranking order, deterministic tie-breaking and input-order independence, distinct profiles, empty catalog, `k=0`, `k` larger than the catalog, invalid CSV rows, invalid preferences, ranking modes, variety reranking (effect, truthful explanations, determinism, top-k semantics), table formatting at many widths, the command-line options, and functional/OOP agreement.
 
 **What happened (baseline).**
 
@@ -163,8 +163,11 @@ What was checked, and how:
 - **Outputs.** The output blocks in the README come from running `python3 -m src.main` and `python3 -m src.experiments`; the prose describing them was checked against that output.
 - **Bugs the checks caught during development:** a test that assumed a diversity penalty would change a list whose artists were already all different (the code was right, the test was wrong); an import-time error when ranking-mode presets were added before a helper function was defined; and CLI header lines that overflowed the requested width, found by a width test and fixed in the code rather than by loosening the test.
 - **Things the agent got to decide that deserve a human look:** the weights (2.0 / 1.5 / 2.0 / 0.5 and the 0.5 for each optional attribute), the choice of exact-match genre and mood, the penalty size used in the demos (0.75), the invented song records and their extra-attribute values, and the four listener profiles.
+- **Independent source review:** after implementation, the student requested a separate ChatGPT audit of the committed ZIP. The reviewer reran all 210 tests and compared all nine README output blocks against actual program output; every block matched. That review also identified the two-decimal display rounding caveat explained above.
 - **Not verified:** whether the recommendations are *good* for real listeners. Nothing here involved real listeners.
 
-### Your own reflection
+### My reflection
 
-*To be written by the student before submitting: what you learned about recommenders, anything that surprised you, and how this changes how you think about music apps. This part is personal judgment and is intentionally not filled in.*
+My main takeaway from the results is that a recommendation can look personalized even when it comes from a fairly simple set of rules. Every score can be traced back to genre, mood, energy and optional preferences, rather than being a black box. In the weight experiment, doubling the genre weight did not change the pop top five at all, while some mood and energy changes brought different songs into the list. This makes a good case for checking actual rankings instead of assuming a weight will behave a certain way.
+
+I used Claude Code to implement and test the project from a detailed brief, then requested an independent ChatGPT review of the committed source. That review reran the tests and CLI outputs and caught a small presentation detail: independently rounded explanation terms can differ from the displayed total by 0.01, even though the underlying math is consistent. This also reinforced an important limitation: passing tests means the program follows its rules, not that real people would enjoy the music it recommends. The next thing I would want is real listener feedback and a larger, better-balanced song catalog.
