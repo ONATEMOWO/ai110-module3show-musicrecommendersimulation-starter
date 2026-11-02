@@ -9,3 +9,23 @@ id,title,artist,genre,mood,energy,tempo_bpm,valence,danceability,acousticness
 8,Night Drive Loop,Neon Echo,synthwave,moody,0.75,110,0.49,0.73,0.22
 9,Focus Flow,LoRoom,lofi,focused,0.40,80,0.59,0.60,0.78
 10,Rooftop Lights,Indigo Parade,indie pop,happy,0.76,124,0.81,0.82,0.35
+11,Golden Hour Parade,Cherry Meridian,pop,happy,0.78,122,0.88,0.84,0.15
+12,Heartbeat Static,Velvet Circuit,pop,romantic,0.62,104,0.70,0.72,0.30
+13,Concrete Crown,Kid Atlas,hip hop,confident,0.72,92,0.55,0.86,0.12
+14,Late Bus Home,Marlow Vance,hip hop,chill,0.48,84,0.50,0.74,0.40
+15,Velvet Rain,Sable June,r&b,romantic,0.52,96,0.62,0.70,0.45
+16,Dusty Porch Light,Hollis Reed,country,nostalgic,0.50,88,0.58,0.55,0.80
+17,Moonlit Sonata Sketch,Aria Voss,classical,melancholy,0.18,68,0.25,0.22,0.97
+18,Iron Cathedral,Black Meridian,metal,angry,0.97,168,0.30,0.45,0.04
+19,Rust Belt Anthem,The Gravel Roads,rock,energetic,0.84,138,0.66,0.58,0.15
+20,Paper Planes at Dawn,Wren and Willow,folk,relaxed,0.33,82,0.66,0.50,0.93
+21,Laser Garden,Pulse Arcade,electronic,energetic,0.90,128,0.74,0.90,0.06
+22,Island Time Again,Coral Tide,reggae,relaxed,0.45,78,0.80,0.78,0.55
+23,Blue Hour Confessions,Delta Marrow,blues,sad,0.38,72,0.28,0.44,0.76
+24,Fuego en la Calle,Luna Rivera,latin,happy,0.80,98,0.86,0.89,0.20
+25,Basement Riot,Static Youth,punk,angry,0.94,176,0.52,0.52,0.08
+26,Soulful Sunday,Marlene Cole,soul,uplifting,0.58,94,0.82,0.68,0.50
+27,Glass Cathedral,Aria Voss,classical,relaxed,0.22,64,0.50,0.25,0.96
+28,Neon Rain Drive,Neon Echo,synthwave,energetic,0.82,118,0.60,0.78,0.15
+29,Sunday Slow Dance,Slow Stereo,jazz,romantic,0.34,76,0.68,0.50,0.90
+30,Hyperdrive Heartbeat,Max Pulse,pop,energetic,0.95,140,0.80,0.90,0.04
