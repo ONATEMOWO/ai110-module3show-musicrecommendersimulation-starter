@@ -5,11 +5,14 @@ from pathlib import Path
 
 import pytest
 
-from src.recommender import REQUIRED_COLUMNS, FEATURE_RANGES, load_songs
+from src.recommender import FEATURE_RANGES, OPTIONAL_COLUMNS, REQUIRED_COLUMNS, load_songs
 
 SONGS_CSV = Path(__file__).resolve().parent.parent / "data" / "songs.csv"
 HEADER = ",".join(REQUIRED_COLUMNS)
 GOOD_ROW = "1,Test Song,Test Artist,pop,happy,0.8,120,0.9,0.7,0.2"
+CORE_NUMERIC = ("energy", "tempo_bpm", "valence", "danceability", "acousticness")
+EXTENDED_HEADER = HEADER + "," + ",".join(OPTIONAL_COLUMNS)
+EXTENDED_ROW = GOOD_ROW + ",80,2010,0.1,0.05,0.3"
 
 
 def write_csv(tmp_path, *lines):
@@ -25,9 +28,10 @@ def test_load_songs_converts_numeric_types(tmp_path):
     assert len(songs) == 1
     song = songs[0]
     assert song["id"] == 1 and isinstance(song["id"], int)
-    for column in FEATURE_RANGES:
+    for column in CORE_NUMERIC:
         assert isinstance(song[column], float), column
     assert song["tempo_bpm"] == 120.0
+    assert not any(column in song for column in OPTIONAL_COLUMNS)
     assert song["title"] == "Test Song" and song["genre"] == "pop"
 
 
@@ -136,3 +140,48 @@ def test_catalog_has_variety_in_moods_energy_and_artists(catalog):
     assert len({s["artist"] for s in catalog}) >= 15
     energies = [s["energy"] for s in catalog]
     assert min(energies) < 0.3 and max(energies) > 0.9
+
+
+# --- extended attribute columns ---------------------------------------------
+
+def test_extended_columns_are_loaded_with_types(tmp_path):
+    song = load_songs(write_csv(tmp_path, EXTENDED_HEADER, EXTENDED_ROW))[0]
+    assert song["popularity"] == 80 and isinstance(song["popularity"], int)
+    assert song["release_decade"] == 2010 and isinstance(song["release_decade"], int)
+    for column in ("instrumentalness", "speechiness", "liveness"):
+        assert isinstance(song[column], float)
+
+
+@pytest.mark.parametrize("column, value, fragment", [
+    ("popularity", "101", "'popularity' must be between"),
+    ("popularity", "55.5", "'popularity' must be a whole number"),
+    ("release_decade", "1800", "'release_decade' must be between"),
+    ("instrumentalness", "1.2", "'instrumentalness' must be between"),
+    ("speechiness", "-0.1", "'speechiness' must be between"),
+    ("liveness", "lots", "'liveness' must be a number"),
+    ("liveness", "", "'liveness' must be a number"),
+])
+def test_invalid_extended_values_raise(tmp_path, column, value, fragment):
+    values = dict(zip(EXTENDED_HEADER.split(","), EXTENDED_ROW.split(",")))
+    values[column] = value
+    row = ",".join(values[name] for name in EXTENDED_HEADER.split(","))
+    with pytest.raises(ValueError, match=fragment):
+        load_songs(write_csv(tmp_path, EXTENDED_HEADER, row))
+
+
+def test_catalog_has_all_five_extended_columns_for_every_song():
+    header = SONGS_CSV.read_text(encoding="utf-8").splitlines()[0].split(",")
+    assert tuple(header[len(REQUIRED_COLUMNS):]) == OPTIONAL_COLUMNS
+    for song in load_songs(str(SONGS_CSV)):
+        for column in OPTIONAL_COLUMNS:
+            low, high = FEATURE_RANGES[column]
+            assert low <= song[column] <= high, (song["id"], column)
+
+
+def test_catalog_extended_values_vary_enough_to_matter():
+    songs = load_songs(str(SONGS_CSV))
+    assert len({s["release_decade"] for s in songs}) >= 4
+    assert max(s["popularity"] for s in songs) - min(s["popularity"] for s in songs) >= 40
+    assert max(s["instrumentalness"] for s in songs) > 0.9 > 0.1 > min(s["instrumentalness"] for s in songs)
+    assert max(s["speechiness"] for s in songs) > 0.3
+    assert max(s["liveness"] for s in songs) > 0.5
